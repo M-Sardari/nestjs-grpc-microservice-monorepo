@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+// protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./ --ts_proto_opt=nestJs=true ./proto/auth.proto
+
+package auth;
+
+service UserService {
+    rpc CreateUser(CreateUserDto) returns (User){};
+    rpc findAllUsers (Empty) returns (Users) {};
+    rpc findOneUser (FindOneUserDto ) returns (User){} ;
+    rpc updateUser (UpdateUserDto) returns (User) {};
+    rpc removeUser (FindOneUserDto ) returns (User){} ;
+    rpc queryUsers (stream PaginationDto) returns (stream Users){} ;
+}
+
+message PaginationDto {
+    int32 page = 1;
+    int32 skip = 2;
+}
+message Empty{}
+
+message Users {
+    repeated User users = 1;
+}
+
+message FindOneUserDto {
+    string id = 1;
+}
+
+message UpdateUserDto {
+    string id = 1;
+    SocialMedia socialMedia=2;
+}
+
+message CreateUserDto {
+    string username = 1;
+    string password = 2;
+    string age = 3;
+}
+
+message User {
+    string id = 1;
+    string username = 2;
+    string password = 3;
+    string age = 4;
+    bool subscribed = 5;
+    SocialMedia socialMedia= 6;
+
+}
+
+message SocialMedia {
+    optional string twitterUri  = 1;
+    optional string fbUri  = 2;
+}
