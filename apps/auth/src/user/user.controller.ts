@@ -7,6 +7,8 @@ import {
   UserServiceControllerMethods,
   FindOneUserDto,
   PaginationDto,
+  Empty,
+  ExcelFile,
 } from '@app/common';
 import { Observable } from 'rxjs';
 
@@ -14,6 +16,12 @@ import { Observable } from 'rxjs';
 @UserServiceControllerMethods()
 export class UserController implements UserServiceController {
   constructor(private readonly userService: UserService) {}
+
+  generateExcel() {
+    const x = this.userService.generateExcel();
+    console.log(x);
+    return x;
+  }
 
   createUser(createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);

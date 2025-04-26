@@ -11,6 +11,11 @@ service UserService {
     rpc updateUser (UpdateUserDto) returns (User) {};
     rpc removeUser (FindOneUserDto ) returns (User){} ;
     rpc queryUsers (stream PaginationDto) returns (stream Users){} ;
+    rpc generateExcel (Empty) returns (ExcelFile) {};
+}
+
+message ExcelFile {
+  bytes data = 1;
 }
 
 message PaginationDto {

@@ -5,18 +5,21 @@
 // source: proto/auth.proto
 
 /* eslint-disable */
-import { GrpcMethod, GrpcStreamMethod } from "@nestjs/microservices";
-import { Observable } from "rxjs";
+import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
 
-export const protobufPackage = "auth";
+export const protobufPackage = 'auth';
+
+export interface ExcelFile {
+  data: Uint8Array;
+}
 
 export interface PaginationDto {
   page: number;
   skip: number;
 }
 
-export interface Empty {
-}
+export interface Empty {}
 
 export interface Users {
   users: User[];
@@ -51,7 +54,7 @@ export interface SocialMedia {
   fbUri?: string | undefined;
 }
 
-export const AUTH_PACKAGE_NAME = "auth";
+export const AUTH_PACKAGE_NAME = 'auth';
 
 export interface UserServiceClient {
   createUser(request: CreateUserDto): Observable<User>;
@@ -65,6 +68,8 @@ export interface UserServiceClient {
   removeUser(request: FindOneUserDto): Observable<User>;
 
   queryUsers(request: Observable<PaginationDto>): Observable<Users>;
+
+  generateExcel(request: Empty): Observable<ExcelFile>;
 }
 
 export interface UserServiceController {
@@ -79,21 +84,44 @@ export interface UserServiceController {
   removeUser(request: FindOneUserDto): Promise<User> | Observable<User> | User;
 
   queryUsers(request: Observable<PaginationDto>): Observable<Users>;
+
+  generateExcel(request: Empty): Observable<ExcelFile>;
 }
 
 export function UserServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["createUser", "findAllUsers", "findOneUser", "updateUser", "removeUser"];
+    const grpcMethods: string[] = [
+      'createUser',
+      'findAllUsers',
+      'findOneUser',
+      'updateUser',
+      'removeUser',
+      'generateExcel', // ✅ این خط اضافه شد
+    ];
     for (const method of grpcMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcMethod("UserService", method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcMethod('UserService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
-    const grpcStreamMethods: string[] = ["queryUsers"];
+    const grpcStreamMethods: string[] = ['queryUsers'];
     for (const method of grpcStreamMethods) {
-      const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
-      GrpcStreamMethod("UserService", method)(constructor.prototype[method], method, descriptor);
+      const descriptor: any = Reflect.getOwnPropertyDescriptor(
+        constructor.prototype,
+        method,
+      );
+      GrpcStreamMethod('UserService', method)(
+        constructor.prototype[method],
+        method,
+        descriptor,
+      );
     }
   };
 }
 
-export const USER_SERVICE_NAME = "UserService";
+export const USER_SERVICE_NAME = 'UserService';

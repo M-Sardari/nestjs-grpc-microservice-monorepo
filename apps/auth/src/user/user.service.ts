@@ -5,9 +5,13 @@ import {
   UpdateUserDto,
   Users,
   PaginationDto,
+  ExcelFile,
 } from '@app/common';
 import { randomUUID } from 'crypto';
 import { Observable, Subject } from 'rxjs';
+import * as ExcelJS from 'exceljs';
+import * as Fs from 'fs';
+import { PassThrough } from 'stream'; // const fs = require('fs');
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -82,4 +86,91 @@ export class UserService implements OnModuleInit {
     });
     return subject.asObservable();
   }
+
+  generateExcel(): Observable<ExcelFile> {
+    return new Observable((observer) => {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Users');
+
+      worksheet.columns = [
+        { header: 'ID', key: 'id', width: 36 },
+        { header: 'Username', key: 'username', width: 36 },
+        { header: 'Password', key: 'password', width: 36 },
+        { header: 'Age', key: 'age', width: 10 },
+        { header: 'Subscribed', key: 'subscribed', width: 15 },
+        { header: 'SocialMedia', key: 'socialMedia', width: 15 },
+      ];
+
+      this.users.forEach((user) => {
+        worksheet.addRow(user);
+      });
+
+      // ایجاد یک فایل موقت در حافظه
+      const tempFilePath = './exports/temp_users.xlsx';
+      const stream = Fs.createWriteStream(tempFilePath);
+
+      // نوشتن فایل و ارسال پاسخ
+      workbook.xlsx
+        .write(stream)
+        .then(() => {
+          // خواندن فایل ایجاد شده و ارسال آن
+          Fs.readFile(tempFilePath, (err, data) => {
+            if (err) {
+              observer.error(err);
+              return;
+            }
+
+            observer.next({ data: Buffer.from(data) });
+            observer.complete();
+
+            // حذف فایل موقت پس از ارسال (اختیاری)
+            // Fs.unlink(tempFilePath, (unlinkErr) => {
+            // if (unlinkErr)
+            // console.error('Error deleting temp file:', unlinkErr);
+            // });
+          });
+        })
+        .catch((error) => {
+          observer.error(error);
+        });
+    });
+  }
+
+  // generateExcel(): Observable<ExcelFile> {
+  //   return new Observable((observer) => {
+  //     try {
+  //       const workbook = new ExcelJS.Workbook();
+  //       const worksheet = workbook.addWorksheet('Users');
+
+  //       worksheet.columns = [
+  //         { header: 'ID', key: 'id', width: 36 },
+  //         { header: 'Username', key: 'username', width: 36 },
+  //         { header: 'Password', key: 'password', width: 36 },
+  //         { header: 'Age', key: 'age', width: 10 },
+  //         { header: 'Subscribed', key: 'subscribed', width: 15 },
+  //         { header: 'SocialMedia', key: 'socialMedia', width: 15 },
+  //       ];
+
+  //       this.users.forEach((user) => {
+  //         worksheet.addRow(user);
+  //       });
+
+  //       const passThrough = new PassThrough();
+  //       const chunks: Buffer[] = [];
+
+  //       passThrough.on('data', (chunk) => chunks.push(chunk));
+  //       passThrough.on('end', () => {
+  //         observer.next({ data: Buffer.concat(chunks) });
+  //         observer.complete();
+  //       });
+  //       passThrough.on('error', (error) => observer.error(error));
+
+  //       workbook.xlsx
+  //         .write(passThrough)
+  //         .catch((error) => observer.error(error));
+  //     } catch (error) {
+  //       observer.error(error);
+  //     }
+  //   });
+  // }
 }

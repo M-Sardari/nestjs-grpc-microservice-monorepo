@@ -9,6 +9,7 @@ import {
 import { AUTH_SERVICE } from './constants';
 import { ClientGrpc } from '@nestjs/microservices';
 import { ReplaySubject } from 'rxjs';
+import { Response } from 'express';
 
 @Injectable()
 export class UserService implements OnModuleInit {
@@ -56,5 +57,28 @@ export class UserService implements OnModuleInit {
       console.log('Chunk', chunkNumber, users);
       chunkNumber++;
     });
+  }
+
+  downloadExcel(res: Response) {
+    this.userService.generateExcel({}).subscribe({
+      next: (buffer) => {
+        console.log('buffer received', buffer);
+        res.set({
+          'Content-Type':
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'Content-Disposition': 'attachment; filename=users.xlsx',
+        });
+        res.send(Buffer.from(buffer.data));
+        true;
+      },
+      complete: () => {
+        console.log('done!');
+      },
+      error: (err) => {
+        console.error('error:', err);
+      },
+    });
+
+    // this.userService.generateExcel({}).subscribe((file) => {});
   }
 }

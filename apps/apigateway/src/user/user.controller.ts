@@ -7,9 +7,11 @@ import {
   Param,
   Delete,
   Put,
+  Res,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, UpdateUserDto } from '@app/common';
+import { Response } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -23,6 +25,11 @@ export class UserController {
   @Get()
   findAll() {
     return this.userService.findAll();
+  }
+
+  @Post('download-excel')
+  downloadExcel(@Res() res: Response) {
+    return this.userService.downloadExcel(res);
   }
 
   @Get(':id')

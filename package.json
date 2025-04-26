@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "proto:gen": "protoc --plugin=protoc-gen-ts_proto=D:\\Source\\nestjs-grpc-microservice-monorepo\\node_modules\\.bin\\protoc-gen-ts_proto.cmd --ts_proto_out=./ --ts_proto_opt=nestJs=true ./proto/auth.proto",
     "build": "nest build",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
@@ -27,9 +28,10 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/microservices": "^11.0.20",
     "@nestjs/platform-express": "^11.0.20",
+    "exceljs": "^4.4.0",
+    "express": "^5.1.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1",
-    "ts-proto": "^2.7.0"
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -52,6 +54,7 @@
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
+    "ts-proto": "^2.7.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.3"
   },
